@@ -243,9 +243,6 @@ class AutoFTP():
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkweb2017-top10000.txt')
 		elif 'Common-CBLUEentials/10k-most-common' in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-CBLUEentials/10k-most-common.txt')
-		# REMOVE dict.txt
-		elif 'dict' in wordlist:
-			link = ('https://raw.githubusercontent.com/Waxxx333/Testing/main/dict2.txt')
 		else:
 			data = ( BLINK+BLUE+BOLD+DIM+'Oops ! Something went wrong'+RESET+BOLD )
 			echo_f ( data )
