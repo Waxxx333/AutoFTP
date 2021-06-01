@@ -7,6 +7,7 @@ FTP brute force script written in Python 3 that has the option of using your own
 scrape wordlists from GitHub.
 * ***Currenlty contains 12 wordlists with over*** **17,580,792** ***words***
 * ***Has*** **rockyou.txt**
+* **Uses threading**
 ![SS](https://imgur.com/fCY8PcA.png)
 <br><a href="https://www.youtube.com/watch?v=1uzuJgQCCHo"><b><p align="center">🠋 Click the screenshot below to watch the demo 🠋</p></b></a>
 [![Demo](https://imgur.com/Siw2THn.png)](https://www.youtube.com/watch?v=1uzuJgQCCHo)
