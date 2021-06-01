@@ -23,16 +23,15 @@ script = (os.path.basename(sys.argv[0]));
 headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'}
 lists = ({
 'https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top12Thousand-probable-v2.txt'#,
-'https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top1575-probable-v2.txt',
 'https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top207-probable-v2.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/2020-200_most_used_passwords.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Most-Popular-Letter-Passes.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/bt4-password.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkc0de.txt',
 'https://www.scrapmaker.com/data/wordlists/dictionaries/rockyou.txt',
+'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/probable-v2-top1575.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Cracked-Hashes/milw0rm-dictionary.txt',
 'https://raw.githubusercontent.com/praetorian-inc/Hob0Rules/master/wordlists/shortKrak.txt',
-'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/probable-v2-top207.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkweb2017-top10000.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-CBLUEentials/10k-most-common.txt'
 })
@@ -153,7 +152,7 @@ class AutoFTP():
 		dirs = []
 		try:
 			ftp=FTP( self.target )
-			ftp.login( 'anonymous','anonymous' )
+			ftp.login( 'anonymous','anonymous@beatYou.com' )
 			data = ( str(f'Anonymous FTP login was successful @ {self.target}' ) )
 			echo_s ( data )
 			ftp.quit()
@@ -215,33 +214,29 @@ class AutoFTP():
 	# 🠉 End of not sure 🠉
 
 	def Scrape(self,wordlist):
-		if 'rockyou' in wordlist:
+		if 'rockyou'.lower() or 'rockyou'.upper() in wordlist:
 			link = ('https://www.scrapmaker.com/data/wordlists/dictionaries/rockyou.txt')
-		elif 'darkc0de' in wordlist:
+		elif 'darkc0de'.lower() or 'darkc0de'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkc0de.txt')
-		elif 'bt4-password' in wordlist:
+		elif 'bt4-password'.lower() or 'bt4-password'.upper()  in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/bt4-password.txt')
-		elif 'shortKrak' in wordlist:
+		elif 'shortKrak'.lower() or 'shortKrak'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/praetorian-inc/Hob0Rules/master/wordlists/shortKrak.txt')
-		elif 'Top12Thousand-probable-v2' in wordlist:
+		elif 'Top12Thousand-probable-v2'.lower() or 'Top12Thousand-probable-v2'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top12Thousand-probable-v2.txt')
-		elif 'Most-Popular-Letter-Passes' in wordlist:
+		elif 'Most-Popular-Letter-Passes'.lower() or 'Most-Popular-Letter-Passes'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Most-Popular-Letter-Passes.txt')
-		elif '2020-200_most_used_passwords' in wordlist:
+		elif '2020-200_most_used_passwords'.lower() or '2020-200_most_used_passwords'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/2020-200_most_used_passwords.txt')
-		elif 'Top207-probable-v2' in wordlist:
-			link = ('https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top207-probable-v2.txt')
-		elif 'Top1575-probable-v2' in wordlist:
-			link = ('https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top1575-probable-v2.txt')
-		elif 'milw0rm-dictionary' in wordlist:
+		elif 'milw0rm-dictionary'.lower() or 'milw0rm-dictionary'.upper()  in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Cracked-Hashes/milw0rm-dictionary.txt')
-		elif 'probable-v2-top1575' in wordlist:
+		elif 'probable-v2-top1575'.lower() or 'probable-v2-top1575'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/probable-v2-top1575.txt')
-		elif 'probable-v2-top207' in wordlist:
+		elif 'probable-v2-top207'.lower() or 'probable-v2-top207'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/probable-v2-top207.txt')
-		elif 'darkweb2017-top10000' in wordlist:
+		elif 'darkweb2017-top10000'.lower() or 'darkweb2017-top10000'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkweb2017-top10000.txt')
-		elif 'Common-CBLUEentials/10k-most-common' in wordlist:
+		elif '10k-most-common'.lower() or '10k-most-common'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-CBLUEentials/10k-most-common.txt')
 		else:
 			data = ( BLINK+BLUE+BOLD+DIM+'Oops ! Something went wrong'+RESET+BOLD )
