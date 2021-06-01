@@ -27,6 +27,10 @@ autoftp -l
 # Show an exact total remote word count
 autoftp -c
 ```
+``` diff
+- Note: 'Top1575-probable-v2' says it only contains one word when 'autoftp -l' is ran, but it does in fact contain 1,575 words
+```
+
 #### More wordlists will be added. Feel free to throw suggestions for specific wordlists and I'll take them into consideration
 <p align="center">
   <img width="120" height="120" src="https://imgur.com/WFurHjU.png">
