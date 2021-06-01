@@ -152,7 +152,7 @@ class AutoFTP():
 		dirs = []
 		try:
 			ftp=FTP( self.target )
-			ftp.login( 'anonymous','anonymous@beatYou.com' )
+			ftp.login( 'anonymous','anonymous' )
 			data = ( str(f'Anonymous FTP login was successful @ {self.target}' ) )
 			echo_s ( data )
 			ftp.quit()
@@ -186,7 +186,9 @@ class AutoFTP():
 			page = self.session.get( link, headers=headers ).text
 			passwords = re.findall('([0-9A-Za-z _\+#$@!&<?>\'"}*{\(\)?%.;:, -:]+)',page)
 			passlist = list(set( passwords ));
-			total_words = len( passwords )
+			total_words = len( passlist )
+			if wordlist == ( 'probable-v2-top1575' ):
+				total_words = 1575
 			do_now(target=self.session.get,**{'url':link,'data':str(passwords)})
 			data = ( DARK+'Wordlist'+BLUE+':'+WHITE+f' {wordlist}'+DARK+' contains'+BLUE+':'+WHITE+f' {total_words}'+DARK+' words' )
 			echo_s ( data )
@@ -214,6 +216,8 @@ class AutoFTP():
 	# 🠉 End of not sure 🠉
 
 	def Scrape(self,wordlist):
+		tries = 0
+		headers = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'}
 		if 'rockyou'.lower() or 'rockyou'.upper() in wordlist:
 			link = ('https://www.scrapmaker.com/data/wordlists/dictionaries/rockyou.txt')
 		elif 'darkc0de'.lower() or 'darkc0de'.upper() in wordlist:
@@ -241,11 +245,15 @@ class AutoFTP():
 		else:
 			data = ( BLINK+BLUE+BOLD+DIM+'Oops ! Something went wrong'+RESET+BOLD )
 			echo_f ( data )
-		headers = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'}
-		tries = 0
 		page = self.session.get(link,headers=headers).text
 		passwords = list(set(re.findall('([0-9A-Za-z _\+#$@!&<?>\'"}*{\(\)?%.;:, -:]+)',page)))
 		total_words = len( passwords )
+		if wordlist == ( 'probable-v2-top1575' ):
+			total_words = 1575
+		elif wordlist == ( '10k-most-common' ):
+			total_words = 10000
+		elif wordlist == ( 'Top207-probable-v2' ):
+			total_words = 207
 		data = ( DARK+'Wordlist'+BLUE+': '+WHITE+f'{wordlist}'+DARK+' contains'+BLUE+': '+WHITE+f'{total_words}'+DARK+' words' )
 		echo_s ( data )
 		for password in passwords:
