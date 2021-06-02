@@ -1,7 +1,6 @@
-[![Python Version](https://img.shields.io/badge/Python-V3-%3Cgreen.svg)](https://shields.io/)
-[![Requests](https://badge.fury.io/py/requests.svg)](https://badge.fury.io/py/requests)
-[![Argparse](https://badge.fury.io/py/argparse.svg)](https://badge.fury.io/py/argparse)
-[![Time](https://badge.fury.io/py/time.svg)](https://badge.fury.io/py/time)
+![AutoFTP](https://img.shields.io/badge/AutoFTP-Python%203-orange.svg)
+![](https://img.shields.io/badge/pypi-requests-orange.svg)
+![](https://img.shields.io/badge/pypi-argparse-orange.svg)
 # AutoFTP
 FTP brute force script written in Python 3 that has the option of using your own wordlists or
 scrape wordlists from GitHub.
